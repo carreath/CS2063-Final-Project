@@ -5,4 +5,8 @@
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.carreath.campushelpmap.map" />
+    tools:context="com.example.carreath.campushelpmap.map"
+    map:cameraTargetLat="45.9458063"
+    map:cameraTargetLng="-66.6405284"
+    map:cameraZoom="16"
+    />
