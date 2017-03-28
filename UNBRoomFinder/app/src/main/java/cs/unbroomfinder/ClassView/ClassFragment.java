@@ -1,4 +1,4 @@
-package cs.unbroomfinder;
+package cs.unbroomfinder.ClassView;
 
 /**
  * Created by kylebrideau on 2017-02-18.
@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import cs.unbroomfinder.R;
 
 
 public class ClassFragment extends Fragment implements View.OnClickListener {

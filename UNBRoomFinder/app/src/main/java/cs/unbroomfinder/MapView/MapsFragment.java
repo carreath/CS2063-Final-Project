@@ -1,7 +1,10 @@
-package cs.unbroomfinder;
+package cs.unbroomfinder.MapView;
 
-import android.support.v4.app.Fragment;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +17,14 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity  extends Fragment implements OnMapReadyCallback {
+import java.io.File;
+
+import cs.unbroomfinder.R;
+
+public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     MapView mMapView;
     private GoogleMap googleMap;
@@ -47,8 +55,21 @@ public class MapsActivity  extends Fragment implements OnMapReadyCallback {
 
         LatLng UNB = new LatLng(45.949783, -66.641719);
         mMap.addMarker(new MarkerOptions().position(UNB).title("Head Hall"));
+        mMap.setOnMarkerClickListener(this);
 
         CameraPosition cameraPosition = new CameraPosition.Builder().target(UNB).zoom(16).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    public boolean onMarkerClick(Marker target) {
+        Log.i(target.getId(), target.getTitle());
+
+        Intent intent = new Intent(getActivity(), BuildingMapActivity.class);
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // Toast.makeText(MapsFragment.this,"No Application available to viewPDF", Toast.LENGTH_SHORT).show();
+        }
+        return false;
     }
 }

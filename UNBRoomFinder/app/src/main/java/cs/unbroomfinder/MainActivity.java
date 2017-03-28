@@ -10,12 +10,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 
-import android.widget.Button;
-
-import com.google.android.gms.maps.GoogleMap;
+import cs.unbroomfinder.ClassView.ClassFragment;
+import cs.unbroomfinder.MapView.MapsFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    MapsActivity tab1 = new MapsActivity();
+                    MapsFragment tab1 = new MapsFragment();
                     return tab1;
                 case 1:
                     ClassFragment tab2 = new ClassFragment();
