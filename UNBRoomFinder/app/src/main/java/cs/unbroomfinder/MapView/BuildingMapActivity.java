@@ -21,7 +21,7 @@ import android.widget.ImageView;
 
 import cs.unbroomfinder.R;
 
-public class BuildingMapActivity extends AppCompatActivity implements View.OnTouchListener {
+public class BuildingMapActivity extends AppCompatActivity {
     public static final String DEBUG_TAG = "DEGUG";
 
     private int grabX, grabY, offsetX = 0, offsetY = 0;
@@ -51,36 +51,12 @@ public class BuildingMapActivity extends AppCompatActivity implements View.OnTou
         Log.i("FFFFFF", height + " " + width);*/
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
 
-        int action = MotionEventCompat.getActionMasked(event);
 
-        switch (action) {
-            case (MotionEvent.ACTION_DOWN):
-                Log.d(DEBUG_TAG, "Action was DOWN");
-                return true;
-            case (MotionEvent.ACTION_MOVE):
-                Log.d(DEBUG_TAG, "Action was MOVE");
-                return true;
-            case (MotionEvent.ACTION_UP):
-                Log.d(DEBUG_TAG, "Action was UP");
-                return true;
-            case (MotionEvent.ACTION_CANCEL):
-                Log.d(DEBUG_TAG, "Action was CANCEL");
-                return true;
-            case (MotionEvent.ACTION_OUTSIDE):
-                Log.d(DEBUG_TAG, "Movement occurred outside bounds " +
-                        "of current screen element");
-                return true;
-            default:
-                return super.onTouchEvent(event);
-        }
-    }
-
-    class myview extends View {
+    class myview extends View implements View.OnTouchListener {
         Bitmap mBitmap;
         int width, height, s_width, s_height;
+        float x=0, y=0;
         public myview(Context context) {
             super(context);
             // TODO Auto-generated constructor stub
@@ -104,6 +80,7 @@ public class BuildingMapActivity extends AppCompatActivity implements View.OnTou
             Matrix matrix = new Matrix();
             matrix.postRotate(-90);
             mBitmap = Bitmap.createBitmap(mBitmap , 0, 0, width, height, matrix, true);
+            setOnTouchListener(this);
 
             Log.i("FFFFFF", height + " " + width + " " + s_height + " " + s_width);
         }
@@ -123,7 +100,7 @@ public class BuildingMapActivity extends AppCompatActivity implements View.OnTou
             super.onDraw(canvas);
 
             canvas.save();
-            canvas.translate((s_width / 2 - width / 2) , (s_height / 2 - height) );
+            canvas.translate(x + (s_width / 2 - width / 2) , y + (s_height / 2 - height) );
             canvas.scale(mScaleFactor, mScaleFactor);
 
             Log.i("FFFFFF", mScaleFactor + "");
@@ -138,6 +115,48 @@ public class BuildingMapActivity extends AppCompatActivity implements View.OnTou
 
 
             canvas.restore();
+        }
+
+        float grabbedX = 0, grabbedY = 0;
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+
+            int action = MotionEventCompat.getActionMasked(event);
+
+            switch (action) {
+                case (MotionEvent.ACTION_DOWN):
+                    Log.d(DEBUG_TAG, "Action was DOWN");
+                    grabbedX = event.getX();
+                    grabbedY = event.getY();
+                    return true;
+                case (MotionEvent.ACTION_MOVE):
+                    Log.d(DEBUG_TAG, "Action was MOVE " + event.getX() + " " + (event.getX() - grabbedX) + " " + event.getY() + " " + (event.getY() - grabbedY));
+
+                    x = x + event.getX() - grabbedX;
+
+                    y =y + event.getY() - grabbedY;
+                    grabbedX = event.getX();
+                    grabbedY = event.getY();
+                    invalidate();
+                    return true;
+                case (MotionEvent.ACTION_UP):
+                    Log.d(DEBUG_TAG, "Action was UP " + event.getX() + " " + (event.getX() - grabbedX) + " " + event.getY() + " " + (event.getY() - grabbedY));
+                    x =x + event.getX() - grabbedX;
+
+                    y =y + event.getY() - grabbedY;
+                    invalidate();
+                    return true;
+                case (MotionEvent.ACTION_CANCEL):
+                    Log.d(DEBUG_TAG, "Action was CANCEL");
+                    return true;
+                case (MotionEvent.ACTION_OUTSIDE):
+                    Log.d(DEBUG_TAG, "Movement occurred outside bounds " +
+                            "of current screen element");
+                    return true;
+                default:
+                    return super.onTouchEvent(event);
+            }
         }
 
         private class ScaleListener
