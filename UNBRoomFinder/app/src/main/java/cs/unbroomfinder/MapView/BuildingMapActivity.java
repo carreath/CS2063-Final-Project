@@ -95,23 +95,24 @@ public class BuildingMapActivity extends AppCompatActivity {
         public void onDraw(Canvas canvas) {
             super.onDraw(canvas);
 
-            x = max(x, 0);
-            y = max(y, 0);
-            x = min(x, width - s_width);
-            y = min(y, height - s_height);
-
+            x = min(x, 0);
+            y = min(y, 0);
+            x = max(x, -mScaleFactor * width + s_width);
+            Log.i("FFFFFFFF", mScaleFactor + " " + x + " " + y);
 
             canvas.save();
-            canvas.translate(x + (s_width / 2 - width / 2) , y + (s_height / 2 - height) );
+            canvas.translate(x , y);
             canvas.scale(mScaleFactor, mScaleFactor);
 
-            int x = 80;
-            int y = 80;
+            int xc = 80;
+            int yc = 80;
             int radius = 40;
             Paint paint = new Paint();
             // Use Color.parseColor to define HTML colors
             paint.setColor(Color.parseColor("#CD5C5C"));
             if(mBitmap != null) canvas.drawBitmap(mBitmap, 0,0, paint);
+            canvas.drawCircle(45, 50, 4, paint);
+            canvas.drawCircle(85,  90, 4, paint);
 
 
             canvas.restore();
@@ -174,7 +175,7 @@ public class BuildingMapActivity extends AppCompatActivity {
                 mScaleFactor *= detector.getScaleFactor();
 
                 // Don't let the object get too small or too large.
-               // mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
+                mScaleFactor = Math.max(0.5f, Math.min(mScaleFactor, 5.0f));
 
                 invalidate();
                 return true;
