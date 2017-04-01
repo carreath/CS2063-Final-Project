@@ -21,6 +21,9 @@ import android.widget.ImageView;
 
 import cs.unbroomfinder.R;
 
+import static java.lang.Math.min;
+import static java.lang.StrictMath.max;
+
 public class BuildingMapActivity extends AppCompatActivity {
     public static final String DEBUG_TAG = "DEGUG";
 
@@ -78,7 +81,7 @@ public class BuildingMapActivity extends AppCompatActivity {
             s_height = size.y;
 
             Matrix matrix = new Matrix();
-            matrix.postRotate(-90);
+            //matrix.postRotate(-90);
             mBitmap = Bitmap.createBitmap(mBitmap , 0, 0, width, height, matrix, true);
             setOnTouchListener(this);
 
@@ -86,24 +89,21 @@ public class BuildingMapActivity extends AppCompatActivity {
         }
 
         private ScaleGestureDetector mScaleDetector;
-        private float mScaleFactor = 1.f;
-
-        @Override
-        public boolean onTouchEvent(MotionEvent ev) {
-            // Let the ScaleGestureDetector inspect all events.
-            mScaleDetector.onTouchEvent(ev);
-            return true;
-        }
+        private float mScaleFactor = 0.5f;
 
         @Override
         public void onDraw(Canvas canvas) {
             super.onDraw(canvas);
 
+            x = max(x, 0);
+            y = max(y, 0);
+            x = min(x, width - s_width);
+            y = min(y, height - s_height);
+
+
             canvas.save();
             canvas.translate(x + (s_width / 2 - width / 2) , y + (s_height / 2 - height) );
             canvas.scale(mScaleFactor, mScaleFactor);
-
-            Log.i("FFFFFF", mScaleFactor + "");
 
             int x = 80;
             int y = 80;
@@ -119,8 +119,15 @@ public class BuildingMapActivity extends AppCompatActivity {
 
         float grabbedX = 0, grabbedY = 0;
 
+        boolean scaled = false;
+
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            if(event.getPointerCount() == 2) {
+                mScaleDetector.onTouchEvent(event);
+                scaled = true;
+                return true;
+            }
 
             int action = MotionEventCompat.getActionMasked(event);
 
@@ -135,16 +142,17 @@ public class BuildingMapActivity extends AppCompatActivity {
 
                     x = x + event.getX() - grabbedX;
 
-                    y =y + event.getY() - grabbedY;
+                    y = y + event.getY() - grabbedY;
                     grabbedX = event.getX();
                     grabbedY = event.getY();
                     invalidate();
                     return true;
                 case (MotionEvent.ACTION_UP):
                     Log.d(DEBUG_TAG, "Action was UP " + event.getX() + " " + (event.getX() - grabbedX) + " " + event.getY() + " " + (event.getY() - grabbedY));
-                    x =x + event.getX() - grabbedX;
-
-                    y =y + event.getY() - grabbedY;
+                    if(!scaled) {
+                        x = x + event.getX() - grabbedX;
+                        y = y + event.getY() - grabbedY;
+                    }
                     invalidate();
                     return true;
                 case (MotionEvent.ACTION_CANCEL):
