@@ -38,22 +38,6 @@
         android:textColor="@color/hint_text" />
 
     <EditText
-        android:id="@+id/input_room_number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Room Number"
-        android:inputType="textPersonName"
-        android:textColor="@color/hint_text"
-        android:textColorHint="@color/hint_text"
-        tools:text="Room Number"
-        android:layout_below="@+id/input_course_name"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <EditText
         android:id="@+id/input_course_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -67,4 +51,13 @@
         android:inputType="textPersonName"
         android:textColor="@color/hint_text"
         android:textColorHint="@color/hint_text" />
+
+    <Spinner
+        android:id="@+id/spin_room_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/input_course_name"
+        android:layout_marginTop="23dp" />
 </RelativeLayout>

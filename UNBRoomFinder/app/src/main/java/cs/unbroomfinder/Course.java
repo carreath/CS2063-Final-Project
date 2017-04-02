@@ -8,17 +8,13 @@ public class Course {
 
     private int _id;
     private String name;
-    private Room rmnumber;
-    private int current_class;
-    private int imported;
+    private int rmnumber;
 
     public Course() {}
 
-    public Course(String name, Room rmnumber, int current_class, int imported) {
+    public Course(String name, int rmnumber) {
         this.name = name;
         this.rmnumber = rmnumber;
-        this.current_class = current_class;
-        this.imported = imported;
     }
 
     // Getters and setters
@@ -27,16 +23,8 @@ public class Course {
         this.name = name;
     }
 
-    public void setRmnumber(Room rmnumber) {
+    public void setRmnumber(int rmnumber) {
         this.rmnumber = rmnumber;
-    }
-
-    public void setCurrentClass(int isCurrent) {
-        current_class = isCurrent;
-    }
-
-    public void setImported(int imported) {
-        this.imported = imported;
     }
 
     public int getID() {
@@ -47,15 +35,7 @@ public class Course {
         return name;
     }
 
-    public Room getRmNumber() {
+    public int getRmNumber() {
         return rmnumber;
-    }
-
-    public int getCurrentClass() {
-        return current_class;
-    }
-
-    public int getImported() {
-        return imported;
     }
 }

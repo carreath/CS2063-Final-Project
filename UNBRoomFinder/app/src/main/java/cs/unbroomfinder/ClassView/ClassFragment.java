@@ -38,13 +38,15 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
             mTwoPane = true;
 
             LinkedList<Course> list = new LinkedList<Course>();
-            list.add(new Course("ABC", null, 0, 0));
-            list.add(new Course("sfgsdABsdfC", null, 0, 0));
-            list.add(new Course("123A123B344ffC", null, 0, 0));
-            list.add(new Course("123A12B123C", null, 0, 0));
-            list.add(new Course("ABC2421", null, 0, 0));
-            list.add(new Course("AfgdfhherC", null, 0, 0));
-            list.add(new Course("sdfsfC", null, 0, 0));
+
+            // TODO: add a query to select all courses
+            list.add(new Course("ABC", 1));
+            list.add(new Course("sfgsdABsdfC", 2));
+            list.add(new Course("123A123B344ffC", 3));
+            list.add(new Course("123A12B123C", 4));
+            list.add(new Course("ABC2421", 5));
+            list.add(new Course("AfgdfhherC", 6));
+            list.add(new Course("sdfsfC", 7));
 
             RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.class_list_recycle);
 
@@ -84,7 +86,8 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.course = mValues.get(position);
             holder.mIdView.setText(mValues.get(position).getName());
-
+            // TODO: change this from FK to name
+            holder.mContentView.setText(mValues.get(position).getRmNumber() + "");
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

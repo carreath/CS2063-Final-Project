@@ -30,7 +30,7 @@ import static java.lang.StrictMath.max;
 public class BuildingMapActivity extends AppCompatActivity {
     public static final String DEBUG_TAG = "DEGUG";
     public static final int PATH_RADIUS = 10;
-    public static LinkedList<Integer[]> path = null;
+    public static LinkedList<Integer[]> shortestPath = null;
 
     private int grabX, grabY, offsetX = 0, offsetY = 0;
 
@@ -67,7 +67,6 @@ public class BuildingMapActivity extends AppCompatActivity {
         float x=0, y=0;
         Map map;
         Graph graph;
-        private LinkedList<Integer[]> shortestPath;
 
         public myview(Context context) {
             super(context);
@@ -109,7 +108,7 @@ public class BuildingMapActivity extends AppCompatActivity {
             mBitmap = Bitmap.createBitmap(mBitmap , 0, 0, width, height, matrix, true);
             setOnTouchListener(this);
 
-            shortestPath = map.getShortestPath(0, 7);
+            //shortestPath = map.getShortestPath(0, 7);
 
             Log.i("FFFFFF", height + " " + width + " " + s_height + " " + s_width);
         }

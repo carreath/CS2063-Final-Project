@@ -10,5 +10,4 @@ public class Room {
     private String building;
     private String roomnumber;
     private String node_id;
-
 }
