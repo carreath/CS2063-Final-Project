@@ -41,7 +41,11 @@
             android:name=".ClassView.AddClassActivity"
             android:label="@string/title_activity_add_class"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".MapView.BuildingMapActivity"></activity>
+        <activity android:name=".MapView.BuildingMapActivity" />
+        <activity
+            android:name=".ClassView.CourseSettingActivity"
+            android:label="@string/title_activity_course_setting"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

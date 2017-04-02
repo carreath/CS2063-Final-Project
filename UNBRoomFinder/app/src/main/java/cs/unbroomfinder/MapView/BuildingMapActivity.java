@@ -30,6 +30,7 @@ import static java.lang.StrictMath.max;
 public class BuildingMapActivity extends AppCompatActivity {
     public static final String DEBUG_TAG = "DEGUG";
     public static final int PATH_RADIUS = 10;
+    public static LinkedList<Integer[]> path = null;
 
     private int grabX, grabY, offsetX = 0, offsetY = 0;
 
@@ -138,6 +139,7 @@ public class BuildingMapActivity extends AppCompatActivity {
             if(mBitmap != null) canvas.drawBitmap(mBitmap, 0,0, paint);
 
             paint.setStrokeWidth(2 * PATH_RADIUS);
+            paint.setStrokeCap(Paint.Cap.ROUND);
 
             for(Integer[] arr: shortestPath) {
                 if(arr[1] == -1) break;
