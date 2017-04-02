@@ -1,6 +1,7 @@
 package cs.unbroomfinder.MapView;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,13 +12,15 @@ import android.graphics.Point;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.widget.ImageView;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedList;
 
 import cs.unbroomfinder.R;
 
@@ -26,6 +29,7 @@ import static java.lang.StrictMath.max;
 
 public class BuildingMapActivity extends AppCompatActivity {
     public static final String DEBUG_TAG = "DEGUG";
+    public static final int PATH_RADIUS = 10;
 
     private int grabX, grabY, offsetX = 0, offsetY = 0;
 
@@ -60,10 +64,29 @@ public class BuildingMapActivity extends AppCompatActivity {
         Bitmap mBitmap;
         int width, height, s_width, s_height;
         float x=0, y=0;
+        Map map;
+        Graph graph;
+        private LinkedList<Integer[]> shortestPath;
+
         public myview(Context context) {
             super(context);
             // TODO Auto-generated constructor stub
             mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
+
+            //map = new Map(context.getAssets().open("headhall.txt"));
+            //AssetManager am = context.getAssets();
+            //System.out.println(am == null);
+            try {
+            map = new Map(context.getAssets().open("headhall.txt"));
+            //    InputStream is = am.open("headhall.txt");
+            //    System.out.println(is == null);
+            }
+            catch(IOException e){}
+
+            graph = map.graph;
+            System.out.println();
+            System.out.println();
+            System.out.println();
 
             BitmapFactory.Options dimensions = new BitmapFactory.Options();
             dimensions.inJustDecodeBounds = true;
@@ -84,6 +107,8 @@ public class BuildingMapActivity extends AppCompatActivity {
             //matrix.postRotate(-90);
             mBitmap = Bitmap.createBitmap(mBitmap , 0, 0, width, height, matrix, true);
             setOnTouchListener(this);
+
+            shortestPath = map.getShortestPath(0, 7);
 
             Log.i("FFFFFF", height + " " + width + " " + s_height + " " + s_width);
         }
@@ -111,9 +136,32 @@ public class BuildingMapActivity extends AppCompatActivity {
             // Use Color.parseColor to define HTML colors
             paint.setColor(Color.parseColor("#CD5C5C"));
             if(mBitmap != null) canvas.drawBitmap(mBitmap, 0,0, paint);
-            canvas.drawCircle(45, 50, 4, paint);
-            canvas.drawCircle(85,  90, 4, paint);
 
+            paint.setStrokeWidth(2 * PATH_RADIUS);
+
+            for(Integer[] arr: shortestPath) {
+                if(arr[1] == -1) break;
+                Point coord1 = graph.getCoords(arr[0]);
+                Point coord2 = graph.getCoords(arr[1]);
+                canvas.drawLine(coord1.x, coord1.y, coord2.x, coord2.y, paint);
+            }
+
+            /*
+            int count = 0;
+            for(int i=0; i<graph.nC; i++) {
+                int[] neighbours = graph.getNeighbours(i);
+                for(int j=0; j<neighbours.length; j++) {
+                    Point coord1 = graph.getCoords(i);
+                    Point coord2 = graph.getCoords(neighbours[j]);
+                    canvas.drawLine(coord1.x, coord1.y, coord2.x, coord2.y, paint);
+                    System.out.println(i + " " + graph.edges[count++]);
+                }
+            }
+            for(int i=0; i<graph.getNumNodes(); i++) {
+                Point coord = graph.getCoords(i);
+                canvas.drawCircle(coord.x, coord.y, PATH_RADIUS, paint);
+            }
+            */
 
             canvas.restore();
         }
