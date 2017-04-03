@@ -49,10 +49,9 @@ public class AddClassActivity extends AppCompatActivity {
 
         spinner = (Spinner) findViewById(R.id.spin_room_number);
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.room_numbers, R.layout.simple_spinner);
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.room_numbers, android.R.layout.simple_spinner_item);
         // Apply the adapter to the spinner
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
 
