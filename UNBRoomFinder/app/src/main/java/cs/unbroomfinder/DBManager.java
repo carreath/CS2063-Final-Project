@@ -117,6 +117,7 @@ public class DBManager extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    // This function is used to add a course to the database
     public void addCourse(Course course, String room) {
         SQLiteDatabase db = getWritableDatabase();
 
@@ -148,8 +149,11 @@ public class DBManager extends SQLiteOpenHelper {
     }
 
     // TODO: implement removing a course
-    public void deleteCourse(Course course) {
-
+    public void deleteCourse(int id) {
+        String query = "DELETE FROM " + TABLE_COURSE + "WHERE _id = " + id;
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL(query);
+        db.close();
     }
 
     public LinkedList<Course> getAllClasses() {
@@ -159,15 +163,17 @@ public class DBManager extends SQLiteOpenHelper {
 
         String name;
         int room;
+        int id;
         if(c != null && c.moveToFirst()) {
             // parse the courses
             while(c.moveToNext()) {
                 name = c.getString(c.getColumnIndex(COLUMN_NAME));
                 room = c.getInt(c.getColumnIndex(COLUMN_ROOM_NUMBER));
-                courses.add(new Course(name, room));
+                id = c.getInt(c.getColumnIndex(COLUMN_ID));
+                courses.add(new Course(name, room, id));
             }
         } else {
-            courses.add(new Course("No Courses Yet!", 0));
+            courses.add(new Course("No Courses Yet!", 0, 0));
         }
 
         db.close();
