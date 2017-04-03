@@ -9,12 +9,14 @@ public class Course {
     private int _id;
     private String name;
     private int rmnumber;
+    private String room_prefix;
 
     public Course() {}
 
-    public Course(String name, int rmnumber) {
+    public Course(String name, int rmnumber, int id) {
         this.name = name;
         this.rmnumber = rmnumber;
+        this._id = id;
     }
 
     // Getters and setters

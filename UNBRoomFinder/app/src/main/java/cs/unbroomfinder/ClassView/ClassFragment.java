@@ -131,11 +131,15 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
                      */
                     String name = holder.course.getName();
                     int roomNumber = holder.course.getRmNumber();
+                    int id = holder.course.getID();
+
+                    System.out.println("ID is : " + id);
 
                     Context context = v.getContext();
                     Intent intent = new Intent(context, SettingActivity.class);
                     intent.putExtra(SettingActivity.COURSE_NAME, name);
                     intent.putExtra(SettingActivity.ROOM_NUMBER, "" + roomNumber);
+                    intent.putExtra(SettingActivity.COURSE_ID, id);
 
                     context.startActivity(intent);
                 }

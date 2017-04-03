@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import cs.unbroomfinder.DBManager;
 import cs.unbroomfinder.MapView.BuildingMapActivity;
 import cs.unbroomfinder.R;
 
@@ -20,6 +21,7 @@ public class SettingActivity extends AppCompatActivity {
     public static final String COURSE_NAME = "courseName";
     // TODO: Fix this
     public static final String ROOM_NUMBER = "testing";
+    public static final String COURSE_ID = "courseID";
 
     Button btn_goto;
     Button btn_edit;
@@ -40,6 +42,8 @@ public class SettingActivity extends AppCompatActivity {
 
         String courseName = intent.getStringExtra(COURSE_NAME);
         final String courseRoom = intent.getStringExtra(ROOM_NUMBER);
+        final String courseID = intent.getStringExtra(COURSE_ID);
+
         if(DEBUG) Log.d(DEBUG_TAG, "COURSE NAME: " + courseName);
         if(DEBUG) Log.d(DEBUG_TAG, "COURSE ROOM: " + courseRoom);
 
@@ -71,6 +75,14 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 onBackPressed();
+            }
+        });
+
+        btn_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DBManager db = DBManager.getInstance(getApplicationContext());
+                db.deleteCourse(Integer.parseInt(courseID));
             }
         });
 
