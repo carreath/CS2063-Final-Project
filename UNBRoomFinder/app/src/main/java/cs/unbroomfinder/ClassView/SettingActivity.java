@@ -42,9 +42,11 @@ public class SettingActivity extends AppCompatActivity {
 
         final String courseName = intent.getStringExtra(COURSE_NAME);
         final String courseRoom = intent.getStringExtra(ROOM_NAME);
+        final String courseRoomNum = intent.getStringExtra(ROOM_NUMBER);
 
         if(DEBUG) Log.d(DEBUG_TAG, "COURSE NAME: " + courseName);
         if(DEBUG) Log.d(DEBUG_TAG, "COURSE ROOM: " + courseRoom);
+        if(DEBUG) Log.d(DEBUG_TAG, "COURSE ROOM NUM: " + courseRoomNum);
 
         text_course_name = (TextView) findViewById(R.id.text_class_name);
         text_room_name = (TextView) findViewById(R.id.text_roomnumber);
@@ -60,7 +62,7 @@ public class SettingActivity extends AppCompatActivity {
         btn_goto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BuildingMapActivity.setPath(0, Integer.parseInt(courseRoom));
+                BuildingMapActivity.setPath(0, Integer.parseInt(courseRoomNum));
                 Intent intent = new Intent(SettingActivity.this, BuildingMapActivity.class);
                 try {
                     startActivity(intent);
@@ -81,7 +83,7 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 DBManager db = DBManager.getInstance(getApplicationContext());
-                db.deleteCourse(courseName, courseRoom);
+                db.deleteCourse(courseName, courseRoomNum);
                 onBackPressed();
             }
         });
