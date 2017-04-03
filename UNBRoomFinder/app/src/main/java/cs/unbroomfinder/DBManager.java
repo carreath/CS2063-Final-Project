@@ -149,8 +149,12 @@ public class DBManager extends SQLiteOpenHelper {
     }
 
     // TODO: implement removing a course
-    public void deleteCourse(int id) {
-        String query = "DELETE FROM " + TABLE_COURSE + "WHERE _id = " + id;
+    public void deleteCourse(String name, String room) {
+        String query = "DELETE FROM " + TABLE_COURSE + " WHERE " +
+                COLUMN_NAME + " = '" + name + "' AND " +
+                COLUMN_ROOM_NUMBER + " = " + room + ";";
+
+        System.out.println(query);
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL(query);
         db.close();
@@ -163,20 +167,31 @@ public class DBManager extends SQLiteOpenHelper {
 
         String name;
         int room;
-        int id;
         if(c != null && c.moveToFirst()) {
             // parse the courses
             while(c.moveToNext()) {
                 name = c.getString(c.getColumnIndex(COLUMN_NAME));
                 room = c.getInt(c.getColumnIndex(COLUMN_ROOM_NUMBER));
-                id = c.getInt(c.getColumnIndex(COLUMN_ID));
-                courses.add(new Course(name, room, id));
+                courses.add(new Course(name, room, context));
             }
         } else {
-            courses.add(new Course("No Courses Yet!", 0, 0));
+            // do nothing
+            //courses.add(new Course("No Courses Yet!", 0, context));
         }
 
         db.close();
         return courses;
+    }
+
+    public String findRoomName(int id) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_ROOM + " WHERE _id = " + id, null);
+
+        String name = null;
+        if(c != null && c.moveToFirst()) {
+            name = c.getString(c.getColumnIndex(COLUMN_ROOM_NAME));
+        }
+
+        return name;
     }
 }
