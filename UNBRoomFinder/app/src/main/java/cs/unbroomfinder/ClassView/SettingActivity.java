@@ -42,6 +42,7 @@ public class SettingActivity extends AppCompatActivity {
 
         final String courseName = intent.getStringExtra(COURSE_NAME);
         final String courseRoom = intent.getStringExtra(ROOM_NAME);
+        final String courseRoomNum = intent.getStringExtra(ROOM_NUMBER);
 
         if(DEBUG) Log.d(DEBUG_TAG, "COURSE NAME: " + courseName);
         if(DEBUG) Log.d(DEBUG_TAG, "COURSE ROOM: " + courseRoom);
@@ -81,7 +82,7 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 DBManager db = DBManager.getInstance(getApplicationContext());
-                db.deleteCourse(courseName, courseRoom);
+                db.deleteCourse(courseName, courseRoomNum);
                 onBackPressed();
             }
         });

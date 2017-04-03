@@ -51,7 +51,8 @@
             android:name=".ClassView.CourseSettingActivity"
             android:label="@string/title_activity_course_setting"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ClassView.SettingActivity"></activity>
+        <activity android:name=".ClassView.SettingActivity" />
+        <activity android:name=".ClassView.EditClassActivity"></activity>
     </application>
 
 </manifest>

@@ -194,4 +194,8 @@ public class DBManager extends SQLiteOpenHelper {
 
         return name;
     }
+
+    public void updateCourse(String name, int room) {
+
+    }
 }
