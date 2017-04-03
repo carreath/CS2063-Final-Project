@@ -5,18 +5,22 @@
     android:orientation="horizontal">
 
     <TextView
-        android:text="AAAAAAAAAAA"
         android:id="@+id/id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:textAppearance="?attr/textAppearanceListItem"/>
+        android:text="AAAAAAAAAAA"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/hint_text"
+        android:textStyle="bold" />
 
     <TextView
-        android:text="AAAAAAAAAAAAAAAAAAAA"
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:textAppearance="?attr/textAppearanceListItem"/>
+        android:text="AAAAAAAAAAAAAAAAAAAA"
+        android:textAlignment="textEnd"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/hint_text" />
 </LinearLayout>

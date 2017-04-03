@@ -76,7 +76,7 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
 
     public void setupRecyclerView() {
         if(DEBUG) Log.d(DEBUG_TAG, "SETTING UP RECYCLER VIEW");
-        LinkedList<Course> list = new LinkedList<Course>();
+        LinkedList<Course> list;
         DBManager db = DBManager.getInstance(getContext());
         list = db.getAllClasses();
 
@@ -116,8 +116,7 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.course = mValues.get(position);
             holder.mIdView.setText(mValues.get(position).getName());
-            // TODO: change this from FK to name
-            holder.mContentView.setText(mValues.get(position).getRmNumber() + "");
+            holder.mContentView.setText(mValues.get(position).getRoomName());
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -131,15 +130,14 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
                      */
                     String name = holder.course.getName();
                     int roomNumber = holder.course.getRmNumber();
-                    int id = holder.course.getID();
+                    String room_name = holder.course.getRoomName();
 
-                    System.out.println("ID is : " + id);
 
                     Context context = v.getContext();
                     Intent intent = new Intent(context, SettingActivity.class);
                     intent.putExtra(SettingActivity.COURSE_NAME, name);
                     intent.putExtra(SettingActivity.ROOM_NUMBER, "" + roomNumber);
-                    intent.putExtra(SettingActivity.COURSE_ID, id);
+                    intent.putExtra(SettingActivity.ROOM_NAME, room_name);
 
                     context.startActivity(intent);
                 }

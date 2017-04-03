@@ -21,7 +21,7 @@ public class SettingActivity extends AppCompatActivity {
     public static final String COURSE_NAME = "courseName";
     // TODO: Fix this
     public static final String ROOM_NUMBER = "testing";
-    public static final String COURSE_ID = "courseID";
+    public static final String ROOM_NAME = "room_name";
 
     Button btn_goto;
     Button btn_edit;
@@ -40,9 +40,8 @@ public class SettingActivity extends AppCompatActivity {
         // TODO add listeners
         // TODO Add cancel button
 
-        String courseName = intent.getStringExtra(COURSE_NAME);
-        final String courseRoom = intent.getStringExtra(ROOM_NUMBER);
-        final String courseID = intent.getStringExtra(COURSE_ID);
+        final String courseName = intent.getStringExtra(COURSE_NAME);
+        final String courseRoom = intent.getStringExtra(ROOM_NAME);
 
         if(DEBUG) Log.d(DEBUG_TAG, "COURSE NAME: " + courseName);
         if(DEBUG) Log.d(DEBUG_TAG, "COURSE ROOM: " + courseRoom);
@@ -82,7 +81,8 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 DBManager db = DBManager.getInstance(getApplicationContext());
-                db.deleteCourse(Integer.parseInt(courseID));
+                db.deleteCourse(courseName, courseRoom);
+                onBackPressed();
             }
         });
 
