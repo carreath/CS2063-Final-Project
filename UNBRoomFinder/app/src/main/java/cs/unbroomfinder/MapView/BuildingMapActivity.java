@@ -2,6 +2,7 @@ package cs.unbroomfinder.MapView;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,6 +11,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,50 +19,74 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import cs.unbroomfinder.R;
 
+import static cs.unbroomfinder.MainActivity.DEBUG;
+import static cs.unbroomfinder.MainActivity.DEBUG_TAG;
+import static cs.unbroomfinder.MainActivity.map;
 import static java.lang.Math.min;
 import static java.lang.StrictMath.max;
 
 public class BuildingMapActivity extends AppCompatActivity {
-    public static final String DEBUG_TAG = "DEGUG";
-    public static final int PATH_RADIUS = 10;
-    public static LinkedList<Integer[]> shortestPath = null;
-    public static int[] endNode = null;
-
-    private int grabX, grabY, offsetX = 0, offsetY = 0;
+    public static final int PATH_RADIUS = 8;
+    public static PriorityNode shortestPath = null;
+    public static Point endNode = null;
+    Button btnUp;
+    Button btnDown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(new MyView(this));
+        setContentView(R.layout.activity_building_map);
+        btnUp = (Button) findViewById(R.id.btnUp);
+        btnDown = (Button) findViewById(R.id.btnDown);
+
+        MyView view = new MyView(this);
+
+        RelativeLayout layout = (RelativeLayout) findViewById(R.id.activity_building_map);
+        layout.addView(view);
+    }
+
+    //TODO USE THESE METHODS TO SET MAP POINTS
+    public static void setPath(int start, int end) {
+        endNode = map.graph.getCoords(end);
+        shortestPath = map.getShortestPath(start, end);
+    }
+
+    public static void setLast(int end) {
+        endNode = map.graph.getCoords(end);
     }
 
     class MyView extends View implements View.OnTouchListener {
+        private ScaleGestureDetector mScaleDetector;
+        private float mScaleFactor = 0.5f;
         Bitmap mBitmap;
         int width, height, s_width, s_height;
         float x=0, y=0;
-        Map map;
-        Graph graph;
+        int selectedImage = 2;
+        int maxImage = 4;
+        int[] images = {R.drawable.ic_head_hall_a, R.drawable.ic_head_hall_b, R.drawable.ic_head_hall_c, R.drawable.ic_head_hall_d, R.drawable.ic_head_hall_e};
 
         public MyView(Context context) {
             super(context);
             // TODO Auto-generated constructor stub
             mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
 
-            BitmapFactory.Options dimensions = new BitmapFactory.Options();
-            dimensions.inJustDecodeBounds = true;
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            mBitmap = BitmapFactory.decodeResource(getResources(), images[selectedImage], options);
 
-            mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_head_hall_c, dimensions);
-            mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_head_hall_c);
-
-            height = dimensions.outHeight;
-            width = dimensions.outWidth;
+            height = mBitmap.getHeight();
+            width = mBitmap.getWidth();
 
             Display display = getWindowManager().getDefaultDisplay();
             Point size = new Point();
@@ -68,17 +94,42 @@ public class BuildingMapActivity extends AppCompatActivity {
             s_width = size.x;
             s_height = size.y;
 
-            Matrix matrix = new Matrix();
-            //matrix.postRotate(-90);
-            mBitmap = Bitmap.createBitmap(mBitmap , 0, 0, width, height, matrix, true);
-            setOnTouchListener(this);
-        }
 
-        private ScaleGestureDetector mScaleDetector;
-        private float mScaleFactor = 0.5f;
+            btnUp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inPreferredConfig = Bitmap.Config.RGB_565;
+                    selectedImage = min(maxImage, selectedImage + 1);
+                    mBitmap = BitmapFactory.decodeResource(getResources(), images[selectedImage], options);
+
+                    invalidate();
+                }
+            });
+
+            btnDown.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inPreferredConfig = Bitmap.Config.RGB_565;
+                    selectedImage = max(0, selectedImage - 1);
+                    mBitmap = BitmapFactory.decodeResource(getResources(), images[selectedImage], options);
+
+                    invalidate();
+                }
+            });
+
+            setOnTouchListener(this);
+
+        }
 
         @Override
         public void onDraw(Canvas canvas) {
+            if(selectedImage == 0) btnDown.setEnabled(false);
+            else btnDown.setEnabled(true);
+            if(selectedImage == maxImage) btnUp.setEnabled(false);
+            else btnUp.setEnabled(true);
+
             super.onDraw(canvas);
 
             x = min(x, 0);
@@ -89,43 +140,30 @@ public class BuildingMapActivity extends AppCompatActivity {
             canvas.translate(x , y);
             canvas.scale(mScaleFactor, mScaleFactor);
 
-            int xc = 80;
-            int yc = 80;
-            int radius = 40;
             Paint paint = new Paint();
-            // Use Color.parseColor to define HTML colors
-            paint.setColor(Color.parseColor("#CD5C5C"));
+            paint.setColor(Color.parseColor("#3d87ff"));
             if(mBitmap != null) canvas.drawBitmap(mBitmap, 0,0, paint);
 
-
             if(shortestPath != null) {
-                paint.setStrokeWidth(2 * PATH_RADIUS);
-                paint.setStrokeCap(Paint.Cap.ROUND);
+                for(int k=1; k<5; k*=4) {
+                    if(k==1) paint.setColor(Color.parseColor("#609dff"));
+                    HashMap<Integer, GraphNode> currentFloor = map.graph.floors[selectedImage];
+                    paint.setStrokeWidth(2 * (PATH_RADIUS + k));
+                    paint.setStrokeCap(Paint.Cap.ROUND);
 
-                for (Integer[] arr : shortestPath) {
-                    if (arr[1] == -1) break;
-                    canvas.drawLine(arr[3],arr[4], arr[5], arr[6], paint);
+                    PriorityNode current = shortestPath;
+                    while (current != null) {
+                        if (current.prev == null) break;
+                        if (currentFloor.containsKey(current.cur.id) && currentFloor.containsKey(current.prev.cur.id)) {
+                            canvas.drawLine(current.cur.coords.x, current.cur.coords.y, current.prev.cur.coords.x, current.prev.cur.coords.y, paint);
+                        }
+                        current = current.prev;
+                    }
                 }
             }
-            if(endNode != null) {
-                canvas.drawCircle(endNode[3], endNode[4], PATH_RADIUS, paint);
+            if(endNode != null && 0 == 1) {
+                canvas.drawCircle(endNode.x, endNode.y, PATH_RADIUS, paint);
             }
-            /*
-            int count = 0;
-            for(int i=0; i<graph.nC; i++) {
-                int[] neighbours = graph.getNeighbours(i);
-                for(int j=0; j<neighbours.length; j++) {
-                    Point coord1 = graph.getCoords(i);
-                    Point coord2 = graph.getCoords(neighbours[j]);
-                    canvas.drawLine(coord1.x, coord1.y, coord2.x, coord2.y, paint);
-                    System.out.println(i + " " + graph.edges[count++]);
-                }
-            }
-            for(int i=0; i<graph.getNumNodes(); i++) {
-                Point coord = graph.getCoords(i);
-                canvas.drawCircle(coord.x, coord.y, PATH_RADIUS, paint);
-            }
-            */
 
             canvas.restore();
         }
@@ -146,12 +184,13 @@ public class BuildingMapActivity extends AppCompatActivity {
 
             switch (action) {
                 case (MotionEvent.ACTION_DOWN):
-                    Log.d(DEBUG_TAG, "Action was DOWN");
+                    if(DEBUG) Log.d(DEBUG_TAG, "Action was DOWN");
+
                     grabbedX = event.getX();
                     grabbedY = event.getY();
                     return true;
                 case (MotionEvent.ACTION_MOVE):
-                    Log.d(DEBUG_TAG, "Action was MOVE " + event.getX() + " " + (event.getX() - grabbedX) + " " + event.getY() + " " + (event.getY() - grabbedY));
+                    if(DEBUG) Log.d(DEBUG_TAG, "Action was MOVE " + event.getX() + " " + (event.getX() - grabbedX) + " " + event.getY() + " " + (event.getY() - grabbedY));
 
                     x = x + event.getX() - grabbedX;
 
@@ -161,7 +200,7 @@ public class BuildingMapActivity extends AppCompatActivity {
                     invalidate();
                     return true;
                 case (MotionEvent.ACTION_UP):
-                    Log.d(DEBUG_TAG, "Action was UP " + event.getX() + " " + (event.getX() - grabbedX) + " " + event.getY() + " " + (event.getY() - grabbedY));
+                    if(DEBUG) Log.d(DEBUG_TAG, "Action was UP " + event.getX() + " " + (event.getX() - grabbedX) + " " + event.getY() + " " + (event.getY() - grabbedY));
                     if(!scaled) {
                         x = x + event.getX() - grabbedX;
                         y = y + event.getY() - grabbedY;
@@ -169,11 +208,10 @@ public class BuildingMapActivity extends AppCompatActivity {
                     invalidate();
                     return true;
                 case (MotionEvent.ACTION_CANCEL):
-                    Log.d(DEBUG_TAG, "Action was CANCEL");
+                    if(DEBUG) Log.d(DEBUG_TAG, "Action was CANCEL");
                     return true;
                 case (MotionEvent.ACTION_OUTSIDE):
-                    Log.d(DEBUG_TAG, "Movement occurred outside bounds " +
-                            "of current screen element");
+                    if(DEBUG) Log.d(DEBUG_TAG, "Movement occurred outside bounds " + "of current screen element");
                     return true;
                 default:
                     return super.onTouchEvent(event);

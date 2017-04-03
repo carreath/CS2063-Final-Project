@@ -6,10 +6,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
+
+import static cs.unbroomfinder.MainActivity.DEBUG;
+import static cs.unbroomfinder.MainActivity.DEBUG_TAG;
 
 /**
  * Created by kylebrideau on 2017-04-01.
@@ -112,7 +116,7 @@ public class DBManager extends SQLiteOpenHelper {
                                 COLUMN_NAME + " DESC");
 
         int room_number = cursor.getInt(0);
-        System.out.println("ROOM VALUE IS: " + room_number);
+        if(DEBUG) Log.d(DEBUG_TAG, "ROOM VALUE IS: " + room_number);
 
         ContentValues values = new ContentValues();
         values.put(COLUMN_NAME, course.getName());

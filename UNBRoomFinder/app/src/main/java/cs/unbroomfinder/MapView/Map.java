@@ -1,108 +1,77 @@
 package cs.unbroomfinder.MapView;
 
-import android.graphics.Point;
+import android.util.Log;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Scanner;
+
+import static cs.unbroomfinder.MainActivity.DEBUG;
+import static cs.unbroomfinder.MainActivity.DEBUG_TAG;
 
 /**
  * Created by carre on 2017-03-30.
  */
 
 public class Map {
-    private HashMap<Integer, Integer[]> vQ = new HashMap<Integer, Integer[]>();
-    Node pQ = null;
+    private HashMap<GraphNode, PriorityNode> vQ = new HashMap<GraphNode, PriorityNode>();
+    PriorityNode pQ = null;
     public Graph graph;
 
     public Map(InputStream mapName) {
         graph = new Graph(mapName);
     }
 
-    public LinkedList<Integer[]> getShortestPath(int start, int end) {
-        int current = start;
-        int pathLength = 0;
-        int prev = -1;
-
-        Integer[] next = {current, prev, pathLength};
-
-        while(current != end) {
-            int[] neighbours = graph.getNeighbours(current);
-            int[] weights = graph.getWeights(current);
-
-            for(int i=0; i<neighbours.length; i++) {
-                Integer[] priority = new Integer[3];
-                priority[0] = neighbours[i];
-                priority[1] = current;
-                priority[2] = pathLength + weights[i];
-                pQadd(priority);
+    public PriorityNode getShortestPath(int start, int end) {
+        int curId = start;
+        GraphNode currentNode = graph.allNodes.get(curId);
+        PriorityNode current = new PriorityNode(currentNode, null, 0, null);
+        while (current != null && current.cur.id != end) {
+            for (GraphNode node : current.cur.neighbours) {
+                PriorityNode next = new PriorityNode(node, current, current.pathLength + current.cur.weights.get(node), null);
+                pQadd(next);
             }
 
-            addVisited(next);
+            addVisited(current);
 
-            next = pQ.data;
-            if(pQ.next != null) pQ = pQ.next;
-            current = next[0];
-            prev = next[1];
-            pathLength = next[2];
+            current = pQ;
+            pQ = pQ.next;
         }
-        Integer[] priority = new Integer[7];
-        priority[0] = current;
-        priority[1] = prev;
-        priority[2] = pathLength;
 
-        LinkedList<Integer[]> path = new LinkedList<Integer[]>();
-
-        while(priority[1] != -1) {
-            priority[3] = graph.getCoords(priority[0]).x;
-            priority[4] = graph.getCoords(priority[0]).y;
-            priority[5] = graph.getCoords(priority[1]).x;
-            priority[6] = graph.getCoords(priority[1]).y;
-            path.addLast(priority);
-            priority = vQ.get(priority[1]);
-        }
-        priority[3] = graph.getCoords(priority[0]).x;
-        priority[4] = graph.getCoords(priority[0]).y;
-        path.addLast(priority);
-
-        return path;
+        return current;
     }
 
-    private void pQadd(Integer[] priority) {
-        Node prev = pQ;
-        Node current = pQ;
+    private void pQadd(PriorityNode next) {
+        if(vQ.get(next.cur) != null && vQ.get(next.cur).pathLength < next.pathLength) return;
+
+        PriorityNode prev = pQ;
+        PriorityNode current = pQ;
         while(current != null) {
-            if(priority[2] < current.data[2]) {
-                Node node = new Node(priority, current);
-                if(prev != current) prev.next = node;
-                else pQ = node;
+            if(next.pathLength < current.pathLength) {
+                next.next = current;
+                if(prev != current) prev.next = next;
+                else pQ = next;
 
                 return;
             }
-            if(current.data[0] == priority[0]) return;
+            if(current.cur == next.cur) return;
 
             prev = current;
             current = current.next;
         }
-        Node node = new Node(priority, null);
-        if(prev != null) prev.next = node;
-        else pQ = node;
+        if(prev != null) prev.next = next;
+        else pQ = next;
     }
 
-    public void addVisited(Integer[] arr) {
-        if(vQ.containsKey(arr[0])) {
-            Integer[] vArr = vQ.get(arr[0]);
-            if(vArr[2] > arr[2]) {
-                vQ.put(arr[0], arr);
+    public void addVisited(PriorityNode current) {
+        if(vQ.containsKey(current.cur)) {
+            PriorityNode next = vQ.get(current.cur);
+            if(next.pathLength > current.pathLength) {
+                vQ.put(current.cur, current);
             }
         }
         else {
-            vQ.put(arr[0], arr);
+            vQ.put(current.cur, current);
         }
     }
 }

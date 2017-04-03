@@ -11,11 +11,20 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedList;
+
 import cs.unbroomfinder.ClassView.ClassFragment;
+import cs.unbroomfinder.MapView.Map;
 import cs.unbroomfinder.MapView.MapsFragment;
 
-public class MainActivity extends AppCompatActivity {
+import static cs.unbroomfinder.MapView.BuildingMapActivity.setPath;
 
+public class MainActivity extends AppCompatActivity {
+    public static final boolean DEBUG = true;
+    public static final String DEBUG_TAG = "DEBUG";
+    public static Map map;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -45,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        Log.i("GG","GG");
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -56,9 +64,13 @@ public class MainActivity extends AppCompatActivity {
         // Create the database
         mDBManager = new DBManager(this, null);
 
-
+        try {
+            map = new Map(getAssets().open("headhall.txt"));
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        setPath(0, 116);
     }
-
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

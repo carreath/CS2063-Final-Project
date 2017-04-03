@@ -24,6 +24,9 @@ import java.io.File;
 
 import cs.unbroomfinder.R;
 
+import static cs.unbroomfinder.MainActivity.DEBUG;
+import static cs.unbroomfinder.MainActivity.DEBUG_TAG;
+
 public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     MapView mMapView;
@@ -46,6 +49,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
         mMapView.getMapAsync(this);
 
+        if(DEBUG) Log.d(DEBUG_TAG, "DONE LOADING MAPS FRAGMENT");
+
         return rootView;
     }
 
@@ -62,7 +67,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     public boolean onMarkerClick(Marker target) {
-        Log.i(target.getId(), target.getTitle());
+        if(DEBUG) Log.d(DEBUG_TAG, target.getId() + " " + target.getTitle());
 
         Intent intent = new Intent(getActivity(), BuildingMapActivity.class);
         try {

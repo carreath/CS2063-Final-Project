@@ -10,17 +10,23 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 
 import cs.unbroomfinder.Course;
 import cs.unbroomfinder.R;
+
+import static cs.unbroomfinder.MainActivity.DEBUG;
+import static cs.unbroomfinder.MainActivity.DEBUG_TAG;
 
 
 public class ClassFragment extends Fragment implements View.OnClickListener {
@@ -38,15 +44,17 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
             mTwoPane = true;
 
             LinkedList<Course> list = new LinkedList<Course>();
+            Scanner sc = null;
+            try {
+                sc = new Scanner(getActivity().getAssets().open("room_numbers.txt"));
+            }catch(IOException e) {
+                e.printStackTrace();
+            }
 
             // TODO: add a query to select all courses
-            list.add(new Course("ABC", 1));
-            list.add(new Course("sfgsdABsdfC", 2));
-            list.add(new Course("123A123B344ffC", 3));
-            list.add(new Course("123A12B123C", 4));
-            list.add(new Course("ABC2421", 5));
-            list.add(new Course("AfgdfhherC", 6));
-            list.add(new Course("sdfsfC", 7));
+            while(sc.hasNextLine()) {
+                list.add(new Course(sc.next(), sc.nextInt()));
+            }
 
             RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.class_list_recycle);
 
@@ -56,6 +64,7 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
             recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(list));
         }
 
+        if(DEBUG) Log.d(DEBUG_TAG, "DONE LOADING MAPS FRAGMENT");
 
         return rootView;
     }
