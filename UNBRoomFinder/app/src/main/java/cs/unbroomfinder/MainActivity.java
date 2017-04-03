@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
 
         // Create the database
-        mDBManager = new DBManager(this, null);
+        mDBManager = DBManager.getInstance(this);
 
         try {
             map = new Map(getAssets().open("headhall.txt"));
@@ -112,5 +112,11 @@ public class MainActivity extends AppCompatActivity {
             }
             return null;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 }

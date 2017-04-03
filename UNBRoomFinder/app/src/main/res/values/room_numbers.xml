@@ -1,22 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="room_numbers">
-        <item>ITC317</item>
+        <item>ITC304</item>
+        <item>ITC305</item>
+        <item>ITC307</item>
+        <item>ITC308</item>
         <item>ITC314</item>
         <item>ITC315</item>
-        <item>GWC127</item>
-        <item>GWC123</item>
-        <item>GWC122</item>
-        <item>GWC112</item>
+        <item>ITC316</item>
+        <item>ITC317</item>
+        <item>ITC318</item>
+        <item>ITC319</item>
+        <item>ITC320</item>
+        <item>ITC321</item>
+        <item>ITC322</item>
+        <item>ITC323</item>
+        <item>GWC106</item>
+        <item>GWC107</item>
+        <item>GWC108</item>
+        <item>GWC109</item>
+        <item>GWC110</item>
         <item>GWC111</item>
+        <item>GWC112</item>
+        <item>GWC113</item>
+        <item>GWC114</item>
+        <item>GWC115</item>
+        <item>GWC116</item>
+        <item>GWC117</item>
+        <item>GWC118</item>
+        <item>GWC119</item>
+        <item>GWC120</item>
+        <item>GWC121</item>
+        <item>GWC122</item>
+        <item>GWC123</item>
+        <item>GWC124</item>
+        <item>GWC127</item>
+        <item>GWC127A</item>
+        <item>GWC128</item>
+        <item>GWC128A</item>
+        <item>GWC128B</item>
+        <item>GWC129</item>
+        <item>HC4</item>
+        <item>HC5</item>
+        <item>HC6</item>
+        <item>HC7</item>
+        <item>HC8</item>
         <item>HC9</item>
         <item>HC10</item>
+        <item>HC11</item>
         <item>HC13</item>
         <item>HC14</item>
-        <item>HC19</item>
-        <item>HC19A</item>
+        <item>HC14A</item>
+        <item>HC14B</item>
+        <item>HC15</item>
         <item>HC23</item>
         <item>HC24</item>
-        <item>HC25</item>
+        <item>ITC405</item>
+        <item>ITC407</item>
+        <item>ITC408</item>
+        <item>ITC414</item>
+        <item>ITC415</item>
+        <item>ITC418</item>
+        <item>ITC419</item>
+        <item>ITC420</item>
+        <item>ITC421</item>
+        <item>ITC422</item>
+        <item>ITC423</item>
     </string-array>
 </resources>

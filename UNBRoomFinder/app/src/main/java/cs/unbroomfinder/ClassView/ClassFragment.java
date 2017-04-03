@@ -6,6 +6,7 @@ package cs.unbroomfinder.ClassView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import cs.unbroomfinder.Course;
+import cs.unbroomfinder.DBManager;
 import cs.unbroomfinder.R;
 
 import static cs.unbroomfinder.MainActivity.DEBUG;
@@ -35,6 +37,7 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        System.out.println("CREATED");
         View rootView = inflater.inflate(R.layout.class_tabs, container, false);
 
         Button btn = (Button) rootView.findViewById(R.id.btn_add_class);
@@ -44,17 +47,21 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
             mTwoPane = true;
 
             LinkedList<Course> list = new LinkedList<Course>();
-            Scanner sc = null;
-            try {
-                sc = new Scanner(getActivity().getAssets().open("room_numbers.txt"));
-            }catch(IOException e) {
-                e.printStackTrace();
-            }
+            DBManager db = DBManager.getInstance(getContext());
+            list = db.getAllClasses();
 
-            // TODO: add a query to select all courses
-            while(sc.hasNextLine()) {
-                list.add(new Course(sc.next(), sc.nextInt()));
-            }
+
+//            Scanner sc = null;
+//            try {
+//                sc = new Scanner(getActivity().getAssets().open("room_numbers.txt"));
+//            }catch(IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            // TODO: add a query to select all courses
+//            while(sc.hasNextLine()) {
+//                list.add(new Course(sc.next(), sc.nextInt()));
+//            }
 
             RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.class_list_recycle);
 
@@ -90,6 +97,8 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
                     .inflate(R.layout.course_item_layout, parent, false);
             return new ViewHolder(view);
         }
+
+
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {

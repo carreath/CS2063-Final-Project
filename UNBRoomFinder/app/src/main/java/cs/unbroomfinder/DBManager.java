@@ -10,6 +10,9 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 import static cs.unbroomfinder.MainActivity.DEBUG;
@@ -21,10 +24,11 @@ import static cs.unbroomfinder.MainActivity.DEBUG_TAG;
 
 public class DBManager extends SQLiteOpenHelper {
     Context context;
+    private static DBManager sInstance;
 
     // If you ever change anything about the database schema, you need to upgrade the version
     // number so that the database can update correctly.
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "courses.db";
 
     public static final String TABLE_COURSE = "courses";
@@ -39,8 +43,15 @@ public class DBManager extends SQLiteOpenHelper {
     public static final String COLUMN_ROOM_NAME = "room_name";
     public static final String COLUMN_NODE_ID = "node_id";
 
+    public static synchronized DBManager getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new DBManager(context, null);
+        }
+        return sInstance;
+    }
+
     // Constructor to create the DBManager
-    public DBManager(Context context, SQLiteDatabase.CursorFactory factory) {
+    private  DBManager(Context context, SQLiteDatabase.CursorFactory factory) {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
         this.context = context;
     }
@@ -50,21 +61,21 @@ public class DBManager extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String query_course = "CREATE TABLE " + TABLE_COURSE + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_ID + " INTEGER PRIMARY KEY, " +
                 COLUMN_NAME + " CHARACTER(40), " +
                 COLUMN_ROOM_NUMBER + " INTEGER, " +
                 " FOREIGN KEY ("+ COLUMN_ROOM_NUMBER +") REFERENCES " + TABLE_ROOM + "(" + COLUMN_ID + "));";
         db.execSQL(query_course);
         String query_room = "CREATE TABLE " + TABLE_ROOM + "(" +
-                COLUMN_ID + "INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_ROOM_NAME  + "CHARACTER(7)," +
-                COLUMN_NODE_ID + " INTEGER; ";
+                COLUMN_ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_ROOM_NAME  + " CHARACTER(7)," +
+                COLUMN_NODE_ID + " INTEGER); ";
         db.execSQL(query_room);
 
-        populateRooms();
+        populateRooms(db);
     }
 
-    private void populateRooms() {
+    private void populateRooms(SQLiteDatabase db) {
         InputStream rooms = null;
         try {
             rooms = context.getAssets().open("room_numbers.txt");
@@ -75,23 +86,27 @@ public class DBManager extends SQLiteOpenHelper {
 
         String[] temp = null;
         String room_number;
-        String node;
+        int node;
         while(sc.hasNextLine()) {
-            temp = sc.nextLine().split(",");
+            temp = sc.nextLine().split(" ");
 
             room_number = temp[0];
-            node = temp[1];
+            node = Integer.parseInt(temp[1]);
 
-            addRoom(room_number, node);
+            //addRoom(room_number, node);
+            db.execSQL("INSERT INTO " + TABLE_ROOM + " (" + COLUMN_ROOM_NAME + ", " + COLUMN_NODE_ID + ")" +
+                    " VALUES ('" + room_number + "', " + node + ");");
+            System.out.println("ADDED ROW");
         }
     }
 
-    private void addRoom(String room_number, String node) {
+    private void addRoom(String room_number, int node) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_ROOM_NAME, room_number);
-        values.put(COLUMN_NODE_ID, Integer.parseInt(node));
+        values.put(COLUMN_NODE_ID, Integer.parseInt(node + ""));
         SQLiteDatabase db = getWritableDatabase();
         db.insert(TABLE_ROOM, null, values);
+        db.close();
     }
 
     // When we upgrade the version of the DB, we will need to do some housekeeping.
@@ -102,33 +117,60 @@ public class DBManager extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addCourse(Course course) {
+    public void addCourse(Course course, String room) {
         SQLiteDatabase db = getWritableDatabase();
 
-        String[] return_columns = {COLUMN_ID};
-        String[] column_values = {course.getRmNumber() + ""};
-        Cursor cursor = db.query(TABLE_ROOM,
-                                return_columns,
-                                COLUMN_ROOM_NUMBER + "= ?",
-                                column_values,
-                                null,
-                                null,
-                                COLUMN_NAME + " DESC");
+        System.out.println("LOOKING FOR ROOM: " + room);
 
-        int room_number = cursor.getInt(0);
-        if(DEBUG) Log.d(DEBUG_TAG, "ROOM VALUE IS: " + room_number);
+        String[] column_values = {room};
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ROOM + " WHERE " + COLUMN_ROOM_NAME + " = ?", column_values);
 
+        cursor.moveToFirst();
+        int room_number = cursor.getColumnCount();
+        if(DEBUG) Log.d(DEBUG_TAG, "COLUMN COUNT IS: " + room_number);
+
+        //String node = cursor.getString(cursor.getColumnIndex(COLUMN_NODE_ID));
+
+        int node = 0;
+        if(cursor != null && cursor.moveToFirst()) {
+            node = cursor.getInt(cursor.getColumnIndex(COLUMN_NODE_ID));
+            if(DEBUG) Log.d(DEBUG_TAG, "NODE IS: " + node);
+        } else {
+            System.out.println("Cursor did not return anything");
+        }
         ContentValues values = new ContentValues();
         values.put(COLUMN_NAME, course.getName());
-        values.put(COLUMN_ROOM_NUMBER, room_number);
+        values.put(COLUMN_ROOM_NUMBER, node);
 
 
         db.insert(TABLE_COURSE, null, values);
-        db.close();
+        cursor.close();
     }
 
     // TODO: implement removing a course
     public void deleteCourse(Course course) {
 
+    }
+
+    public LinkedList<Course> getAllClasses() {
+        SQLiteDatabase db = getWritableDatabase();
+        LinkedList<Course> courses = new LinkedList<Course>();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_COURSE, null);
+
+        String name;
+        int room;
+        if(c != null && c.moveToFirst()) {
+            // parse the courses
+            while(c.moveToNext()) {
+                name = c.getString(c.getColumnIndex(COLUMN_NAME));
+                room = c.getInt(c.getColumnIndex(COLUMN_ROOM_NUMBER));
+                courses.add(new Course(name, room));
+            }
+        } else {
+            courses.add(new Course("No Courses Yet!", 0));
+        }
+
+        db.close();
+        return courses;
     }
 }
