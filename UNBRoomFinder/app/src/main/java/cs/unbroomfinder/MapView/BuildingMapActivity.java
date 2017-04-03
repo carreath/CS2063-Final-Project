@@ -31,68 +31,33 @@ public class BuildingMapActivity extends AppCompatActivity {
     public static final String DEBUG_TAG = "DEGUG";
     public static final int PATH_RADIUS = 10;
     public static LinkedList<Integer[]> shortestPath = null;
+    public static int[] endNode = null;
 
     private int grabX, grabY, offsetX = 0, offsetY = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_building_map);
-        setContentView(new myview(this));
-
-        /*
-        ImageView mImageView;
-        mImageView = (ImageView) findViewById(R.id.imageViewId);
-        mImageView.setImageResource(R.drawable.ic_head_hall_c_1);
-
-        BitmapFactory.Options dimensions = new BitmapFactory.Options();
-        dimensions.inJustDecodeBounds = true;
-
-        Bitmap mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_head_hall_c_1, dimensions);
-        int height = dimensions.outHeight;
-        int width = dimensions.outWidth;
-
-        View myView = findViewById(R.id.activity_building_map);
-        myView.setOnTouchListener(this);
-
-
-        Log.i("FFFFFF", height + " " + width);*/
+        setContentView(new MyView(this));
     }
 
-
-
-    class myview extends View implements View.OnTouchListener {
+    class MyView extends View implements View.OnTouchListener {
         Bitmap mBitmap;
         int width, height, s_width, s_height;
         float x=0, y=0;
         Map map;
         Graph graph;
 
-        public myview(Context context) {
+        public MyView(Context context) {
             super(context);
             // TODO Auto-generated constructor stub
             mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
 
-            //map = new Map(context.getAssets().open("headhall.txt"));
-            //AssetManager am = context.getAssets();
-            //System.out.println(am == null);
-            try {
-            map = new Map(context.getAssets().open("headhall.txt"));
-            //    InputStream is = am.open("headhall.txt");
-            //    System.out.println(is == null);
-            }
-            catch(IOException e){}
-
-            graph = map.graph;
-            System.out.println();
-            System.out.println();
-            System.out.println();
-
             BitmapFactory.Options dimensions = new BitmapFactory.Options();
             dimensions.inJustDecodeBounds = true;
 
-            mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_head_hall_c_1, dimensions);
-            mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_head_hall_c_1);
+            mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_head_hall_c, dimensions);
+            mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_head_hall_c);
 
             height = dimensions.outHeight;
             width = dimensions.outWidth;
@@ -107,10 +72,6 @@ public class BuildingMapActivity extends AppCompatActivity {
             //matrix.postRotate(-90);
             mBitmap = Bitmap.createBitmap(mBitmap , 0, 0, width, height, matrix, true);
             setOnTouchListener(this);
-
-            //shortestPath = map.getShortestPath(0, 7);
-
-            Log.i("FFFFFF", height + " " + width + " " + s_height + " " + s_width);
         }
 
         private ScaleGestureDetector mScaleDetector;
@@ -123,7 +84,6 @@ public class BuildingMapActivity extends AppCompatActivity {
             x = min(x, 0);
             y = min(y, 0);
             x = max(x, -mScaleFactor * width + s_width);
-            Log.i("FFFFFFFF", mScaleFactor + " " + x + " " + y);
 
             canvas.save();
             canvas.translate(x , y);
@@ -137,16 +97,19 @@ public class BuildingMapActivity extends AppCompatActivity {
             paint.setColor(Color.parseColor("#CD5C5C"));
             if(mBitmap != null) canvas.drawBitmap(mBitmap, 0,0, paint);
 
-            paint.setStrokeWidth(2 * PATH_RADIUS);
-            paint.setStrokeCap(Paint.Cap.ROUND);
 
-            for(Integer[] arr: shortestPath) {
-                if(arr[1] == -1) break;
-                Point coord1 = graph.getCoords(arr[0]);
-                Point coord2 = graph.getCoords(arr[1]);
-                canvas.drawLine(coord1.x, coord1.y, coord2.x, coord2.y, paint);
+            if(shortestPath != null) {
+                paint.setStrokeWidth(2 * PATH_RADIUS);
+                paint.setStrokeCap(Paint.Cap.ROUND);
+
+                for (Integer[] arr : shortestPath) {
+                    if (arr[1] == -1) break;
+                    canvas.drawLine(arr[3],arr[4], arr[5], arr[6], paint);
+                }
             }
-
+            if(endNode != null) {
+                canvas.drawCircle(endNode[3], endNode[4], PATH_RADIUS, paint);
+            }
             /*
             int count = 0;
             for(int i=0; i<graph.nC; i++) {

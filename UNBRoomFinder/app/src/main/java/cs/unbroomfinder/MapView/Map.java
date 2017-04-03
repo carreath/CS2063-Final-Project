@@ -1,5 +1,7 @@
 package cs.unbroomfinder.MapView;
 
+import android.graphics.Point;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +51,7 @@ public class Map {
             prev = next[1];
             pathLength = next[2];
         }
-        Integer[] priority = new Integer[3];
+        Integer[] priority = new Integer[7];
         priority[0] = current;
         priority[1] = prev;
         priority[2] = pathLength;
@@ -57,9 +59,15 @@ public class Map {
         LinkedList<Integer[]> path = new LinkedList<Integer[]>();
 
         while(priority[1] != -1) {
+            priority[3] = graph.getCoords(priority[0]).x;
+            priority[4] = graph.getCoords(priority[0]).y;
+            priority[5] = graph.getCoords(priority[1]).x;
+            priority[6] = graph.getCoords(priority[1]).y;
             path.addLast(priority);
             priority = vQ.get(priority[1]);
         }
+        priority[3] = graph.getCoords(priority[0]).x;
+        priority[4] = graph.getCoords(priority[0]).y;
         path.addLast(priority);
 
         return path;
