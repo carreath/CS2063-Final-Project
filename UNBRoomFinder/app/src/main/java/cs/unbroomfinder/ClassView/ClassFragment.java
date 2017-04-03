@@ -33,22 +33,19 @@ import static cs.unbroomfinder.MainActivity.DEBUG_TAG;
 
 public class ClassFragment extends Fragment implements View.OnClickListener {
     private boolean mTwoPane = false;
+    private View rootView = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         System.out.println("CREATED");
-        View rootView = inflater.inflate(R.layout.class_tabs, container, false);
+        rootView = inflater.inflate(R.layout.class_tabs, container, false);
 
         Button btn = (Button) rootView.findViewById(R.id.btn_add_class);
         btn.setOnClickListener(this);
 
         if(rootView.findViewById(R.id.class_list_recycle) != null) {
             mTwoPane = true;
-
-            LinkedList<Course> list = new LinkedList<Course>();
-            DBManager db = DBManager.getInstance(getContext());
-            list = db.getAllClasses();
 
 
 //            Scanner sc = null;
@@ -63,17 +60,32 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
 //                list.add(new Course(sc.next(), sc.nextInt()));
 //            }
 
-            RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.class_list_recycle);
-
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
-            recyclerView.setLayoutManager(mLayoutManager);
-
-            recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(list));
+            setupRecyclerView();
         }
 
         if(DEBUG) Log.d(DEBUG_TAG, "DONE LOADING MAPS FRAGMENT");
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setupRecyclerView();
+    }
+
+    public void setupRecyclerView() {
+        if(DEBUG) Log.d(DEBUG_TAG, "SETTING UP RECYCLER VIEW");
+        LinkedList<Course> list = new LinkedList<Course>();
+        DBManager db = DBManager.getInstance(getContext());
+        list = db.getAllClasses();
+
+        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.class_list_recycle);
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(list));
     }
 
     @Override
