@@ -11,6 +11,9 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -25,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     public static final boolean DEBUG = true;
     public static final String DEBUG_TAG = "DEBUG";
     public static Map map;
+    public static Door door;
+    public static GoogleGPS googleGPS = null;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -48,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        googleGPS = new GoogleGPS(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -69,7 +76,9 @@ public class MainActivity extends AppCompatActivity {
         } catch(IOException e) {
             e.printStackTrace();
         }
-        setPath(0, 116);
+        door = new Door(this);
+
+        setPath(door.getNearestDoor(), 115);
     }
 
     /**
