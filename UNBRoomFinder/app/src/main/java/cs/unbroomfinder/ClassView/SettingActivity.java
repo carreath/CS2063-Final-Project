@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import cs.unbroomfinder.Course;
 import cs.unbroomfinder.DBManager;
+import cs.unbroomfinder.MainActivity;
 import cs.unbroomfinder.MapView.BuildingMapActivity;
 import cs.unbroomfinder.R;
 
@@ -42,6 +43,7 @@ public class SettingActivity extends AppCompatActivity {
         DBManager db = DBManager.getInstance(getApplicationContext());
         System.out.println("the course-id i got was: " + course_id);
         final Course course = db.getCourse(course_id);
+        final int node_id = db.getNodeNumber(course.getRoomNumber());
 
         text_course_name = (TextView) findViewById(R.id.text_class_name);
         text_room_name = (TextView) findViewById(R.id.text_roomnumber);
@@ -57,13 +59,16 @@ public class SettingActivity extends AppCompatActivity {
         btn_goto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //BuildingMapActivity.setPath(0, Integer.parseInt(courseRoomNum));
+                System.out.println("THE NODE WE ARE GOING TO: " + node_id);
+                System.out.println("NEAREST DOOR: " + MainActivity.door.getNearestDoor());
+                BuildingMapActivity.setPath(MainActivity.door.getNearestDoor(), node_id);
                 Intent intent = new Intent(SettingActivity.this, BuildingMapActivity.class);
                 try {
                     startActivity(intent);
                 } catch (ActivityNotFoundException e) {
                     // Toast.makeText(MapsFragment.this,"No Application available to viewPDF", Toast.LENGTH_SHORT).show();
                 }
+                finish();
             }
         });
 

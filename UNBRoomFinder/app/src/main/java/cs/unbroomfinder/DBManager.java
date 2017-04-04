@@ -206,6 +206,17 @@ public class DBManager extends SQLiteOpenHelper {
         return value;
     }
 
+    public int getNodeNumber(int room_id) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_ROOM + " WHERE " + COLUMN_ID + " = " + room_id + ";", null);
+
+        int node_id = -1;
+        if(c != null && c.moveToFirst()) {
+            node_id = c.getInt(c.getColumnIndex(COLUMN_NODE_ID));
+        }
+        return node_id;
+    }
+
     public void updateCourse(String name, String room, int course_id) {
         SQLiteDatabase db = getWritableDatabase();
         String query = "UPDATE " + TABLE_COURSE + " SET " + COLUMN_COURSE_NAME + " = '" + name + "' , " +
