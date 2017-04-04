@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import cs.unbroomfinder.Course;
 import cs.unbroomfinder.DBManager;
 import cs.unbroomfinder.MapView.BuildingMapActivity;
 import cs.unbroomfinder.R;
@@ -18,10 +19,7 @@ import static cs.unbroomfinder.MainActivity.DEBUG;
 import static cs.unbroomfinder.MainActivity.DEBUG_TAG;
 
 public class SettingActivity extends AppCompatActivity {
-    public static final String COURSE_NAME = "courseName";
-    // TODO: Fix this
-    public static final String ROOM_NUMBER = "testing";
-    public static final String ROOM_NAME = "room_name";
+    public static final String COURSE_ID = "course_id";
 
     Button btn_goto;
     Button btn_edit;
@@ -40,19 +38,16 @@ public class SettingActivity extends AppCompatActivity {
         // TODO add listeners
         // TODO Add cancel button
 
-        final String courseName = intent.getStringExtra(COURSE_NAME);
-        final String courseRoom = intent.getStringExtra(ROOM_NAME);
-        final String courseRoomNum = intent.getStringExtra(ROOM_NUMBER);
-
-        if(DEBUG) Log.d(DEBUG_TAG, "COURSE NAME: " + courseName);
-        if(DEBUG) Log.d(DEBUG_TAG, "COURSE ROOM: " + courseRoom);
-        if(DEBUG) Log.d(DEBUG_TAG, "COURSE ROOM NUM: " + courseRoomNum);
+        int course_id = intent.getIntExtra(COURSE_ID, 0);
+        DBManager db = DBManager.getInstance(getApplicationContext());
+        System.out.println("the course-id i got was: " + course_id);
+        final Course course = db.getCourse(course_id);
 
         text_course_name = (TextView) findViewById(R.id.text_class_name);
         text_room_name = (TextView) findViewById(R.id.text_roomnumber);
 
-        text_course_name.setText(courseName);
-        text_room_name.setText(courseRoom);
+        text_course_name.setText(course.getCourseName());
+        text_room_name.setText(course.getRoomName());
 
         btn_goto = (Button) findViewById(R.id.btn_goto);
         btn_edit = (Button) findViewById(R.id.btn_edit);
@@ -62,7 +57,7 @@ public class SettingActivity extends AppCompatActivity {
         btn_goto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BuildingMapActivity.setPath(0, Integer.parseInt(courseRoomNum));
+                //BuildingMapActivity.setPath(0, Integer.parseInt(courseRoomNum));
                 Intent intent = new Intent(SettingActivity.this, BuildingMapActivity.class);
                 try {
                     startActivity(intent);
@@ -75,7 +70,7 @@ public class SettingActivity extends AppCompatActivity {
         btn_goback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                finish();
             }
         });
 
@@ -83,10 +78,25 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 DBManager db = DBManager.getInstance(getApplicationContext());
-                db.deleteCourse(courseName, courseRoomNum);
+                db.deleteCourse(course.getID());
                 onBackPressed();
             }
         });
 
+        btn_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SettingActivity.this, EditClassActivity.class);
+                intent.putExtra(COURSE_ID, course.getID());
+                startActivity(intent);
+                finish();
+            }
+        });
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 }

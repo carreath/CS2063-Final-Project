@@ -69,10 +69,11 @@ public class AddClassActivity extends AppCompatActivity {
 
         // Create a course object
         Course new_course = new Course();
-        new_course.setName(name);
+        new_course.setCourseName(name);
+        new_course.setRoomName(room);
 
         DBManager db = DBManager.getInstance(this);
-        db.addCourse(new_course, room);
+        db.addCourse(new_course);
         db.close();
 
         onBackPressed();

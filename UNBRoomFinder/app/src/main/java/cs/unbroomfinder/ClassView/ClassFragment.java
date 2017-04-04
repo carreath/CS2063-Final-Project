@@ -115,30 +115,19 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.course = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).getName());
+            holder.mIdView.setText(mValues.get(position).getCourseName());
             holder.mContentView.setText(mValues.get(position).getRoomName());
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /**
-                     * Setting the data to be sent to the Detail portion of the template.
-                     * Here, we send the title, longitude, and latitude of the Earthquake
-                     * that was clicked in the RecyclerView. The Detail Activity/Fragment
-                     * will then display this information. Condition check is whether we
-                     * are twoPane on a Tablet, which varies how we pass arguments to the
-                     * participating activity/fragment.
-                     */
-                    String name = holder.course.getName();
-                    int roomNumber = holder.course.getRmNumber();
-                    String room_name = holder.course.getRoomName();
 
+                    // We want to pass through the course ID
+                    int course_id = holder.course.getID();
 
+                    // Start the new settings intent
                     Context context = v.getContext();
                     Intent intent = new Intent(context, SettingActivity.class);
-                    intent.putExtra(SettingActivity.COURSE_NAME, name);
-                    intent.putExtra(SettingActivity.ROOM_NUMBER, "" + roomNumber);
-                    intent.putExtra(SettingActivity.ROOM_NAME, room_name);
-
+                    intent.putExtra(SettingActivity.COURSE_ID, course_id);
                     context.startActivity(intent);
                 }
             });

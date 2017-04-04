@@ -9,41 +9,39 @@ import android.content.Context;
 public class Course {
 
     private int _id;
-    private String name;
-    private int rmnumber;
+    private int room_number;
+    private String course_name;
     private String room_name;
+
+    // Constructor that takes in all the information and stores it into private variables
+    public Course(int _id, int room_number, String course_name, String room_name) {
+        this._id = _id;
+        this.room_number = room_number;
+        this.course_name = course_name;
+        this.room_name = room_name;
+    }
 
     public Course() {}
 
-    public Course(String name, int rmnumber, Context context) {
-        this.name = name;
-        this.rmnumber = rmnumber;
-
-        DBManager db = DBManager.getInstance(context);
-        room_name = db.findRoomName(rmnumber);
+    public void setRoomNumber(int room_number) {
+        this.room_number = room_number;
     }
 
-    // Getters and setters
-
-    public void setName(String name) {
-        this.name = name;
+    public void setCourseName(String course_name) {
+        this.course_name = course_name;
     }
 
-    public void setRmnumber(int rmnumber) {
-        this.rmnumber = rmnumber;
+    public void setRoomName(String room_name) {
+        this.room_name = room_name;
     }
 
     public int getID() {
         return _id;
     }
 
-    public String getName() {
-        return name;
-    }
+    public int getRoomNumber() {return room_number; }
 
-    public int getRmNumber() {
-        return rmnumber;
-    }
+    public String getCourseName() { return course_name; }
 
     public String getRoomName() { return room_name; }
 }

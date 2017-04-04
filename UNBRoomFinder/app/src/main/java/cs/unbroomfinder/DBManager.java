@@ -28,7 +28,7 @@ public class DBManager extends SQLiteOpenHelper {
 
     // If you ever change anything about the database schema, you need to upgrade the version
     // number so that the database can update correctly.
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "courses.db";
 
     public static final String TABLE_COURSE = "courses";
@@ -36,7 +36,7 @@ public class DBManager extends SQLiteOpenHelper {
 
     // Column Names for Course table
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_COURSE_NAME = "name";
     public static final String COLUMN_ROOM_NUMBER = "rmnumber";
 
     // Column Names for room table
@@ -62,7 +62,7 @@ public class DBManager extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String query_course = "CREATE TABLE " + TABLE_COURSE + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY, " +
-                COLUMN_NAME + " CHARACTER(40), " +
+                COLUMN_COURSE_NAME + " CHARACTER(40), " +
                 COLUMN_ROOM_NUMBER + " INTEGER, " +
                 " FOREIGN KEY ("+ COLUMN_ROOM_NUMBER +") REFERENCES " + TABLE_ROOM + "(" + COLUMN_ID + "));";
         db.execSQL(query_course);
@@ -93,20 +93,10 @@ public class DBManager extends SQLiteOpenHelper {
             room_number = temp[0];
             node = Integer.parseInt(temp[1]);
 
-            //addRoom(room_number, node);
             db.execSQL("INSERT INTO " + TABLE_ROOM + " (" + COLUMN_ROOM_NAME + ", " + COLUMN_NODE_ID + ")" +
                     " VALUES ('" + room_number + "', " + node + ");");
             System.out.println("ADDED ROW");
         }
-    }
-
-    private void addRoom(String room_number, int node) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_ROOM_NAME, room_number);
-        values.put(COLUMN_NODE_ID, Integer.parseInt(node + ""));
-        SQLiteDatabase db = getWritableDatabase();
-        db.insert(TABLE_ROOM, null, values);
-        db.close();
     }
 
     // When we upgrade the version of the DB, we will need to do some housekeeping.
@@ -118,71 +108,80 @@ public class DBManager extends SQLiteOpenHelper {
     }
 
     // This function is used to add a course to the database
-    public void addCourse(Course course, String room) {
+    public void addCourse(Course course) {
         SQLiteDatabase db = getWritableDatabase();
-
-        System.out.println("LOOKING FOR ROOM: " + room);
-
-        String[] column_values = {room};
+        System.out.println("ROOM: " + course.getRoomName());
+        String[] column_values = {course.getRoomName()};
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ROOM + " WHERE " + COLUMN_ROOM_NAME + " = ?", column_values);
 
         cursor.moveToFirst();
-        int room_number = cursor.getColumnCount();
-        if(DEBUG) Log.d(DEBUG_TAG, "COLUMN COUNT IS: " + room_number);
-
-        //String node = cursor.getString(cursor.getColumnIndex(COLUMN_NODE_ID));
 
         int node = 0;
         if(cursor != null && cursor.moveToFirst()) {
-            node = cursor.getInt(cursor.getColumnIndex(COLUMN_NODE_ID));
+            node = cursor.getInt(cursor.getColumnIndex(COLUMN_ID));
             if(DEBUG) Log.d(DEBUG_TAG, "NODE IS: " + node);
         } else {
             System.out.println("Cursor did not return anything");
         }
         ContentValues values = new ContentValues();
-        values.put(COLUMN_NAME, course.getName());
+        values.put(COLUMN_COURSE_NAME, course.getCourseName());
         values.put(COLUMN_ROOM_NUMBER, node);
 
 
-        db.insert(TABLE_COURSE, null, values);
+        long row = db.insert(TABLE_COURSE, null, values);
+        System.out.println("ADDED COURSE: " + row);
         cursor.close();
     }
 
-    // TODO: implement removing a course
-    public void deleteCourse(String name, String room) {
-        String query = "DELETE FROM " + TABLE_COURSE + " WHERE " +
-                COLUMN_NAME + " = '" + name + "' AND " +
-                COLUMN_ROOM_NUMBER + " = " + room + ";";
+    public void deleteCourse(int course_id) {
+        String query = "DELETE FROM " + TABLE_COURSE + " WHERE " + COLUMN_ID + " = " + course_id +  ";";
 
         System.out.println(query);
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL(query);
-        db.close();
     }
 
     public LinkedList<Course> getAllClasses() {
         SQLiteDatabase db = getWritableDatabase();
         LinkedList<Course> courses = new LinkedList<Course>();
         Cursor c = db.rawQuery("SELECT * FROM " + TABLE_COURSE, null);
-
-        String name;
-        int room;
+        String course_name;
+        int room_number;
+        int _id;
         if(c != null && c.moveToFirst()) {
             // parse the courses
-            while(c.moveToNext()) {
-                name = c.getString(c.getColumnIndex(COLUMN_NAME));
-                room = c.getInt(c.getColumnIndex(COLUMN_ROOM_NUMBER));
-                courses.add(new Course(name, room, context));
-            }
+            do {
+                course_name = c.getString(c.getColumnIndex(COLUMN_COURSE_NAME));
+                room_number = c.getInt(c.getColumnIndex(COLUMN_ROOM_NUMBER));
+                _id = c.getInt(c.getColumnIndex(COLUMN_ID));
+                System.out.println("VALUE OF ID: " + _id);
+                courses.add(new Course(_id, room_number, course_name, findRoomName(room_number)));
+            } while(c.moveToNext());
         } else {
-            // do nothing
-            //courses.add(new Course("No Courses Yet!", 0, context));
+            System.out.println("NOT WORKING");
         }
 
-        db.close();
         return courses;
     }
 
+    public Course getCourse(int course_id) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_COURSE + " WHERE " + COLUMN_ID + " = " + course_id + ";";
+
+        Cursor c = db.rawQuery(query, null);
+        Course course = null;
+
+        if(c != null && c.moveToFirst()) {
+            String course_name = c.getString(c.getColumnIndex(COLUMN_COURSE_NAME));
+            int room_number = c.getInt(c.getColumnIndex(COLUMN_ROOM_NUMBER));
+            String room_name = findRoomName(room_number);
+            course = new Course(course_id, room_number, course_name, room_name);
+        }
+
+        return course;
+    }
+
+    // Function findRoomName will take in an id and output the String for the room
     public String findRoomName(int id) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM " + TABLE_ROOM + " WHERE _id = " + id, null);
@@ -191,11 +190,28 @@ public class DBManager extends SQLiteOpenHelper {
         if(c != null && c.moveToFirst()) {
             name = c.getString(c.getColumnIndex(COLUMN_ROOM_NAME));
         }
-
         return name;
     }
 
-    public void updateCourse(String name, int room) {
+    // Function findRoomNumber takes in the room name and returns the id of the room.
+    public int findRoomNumber(String name) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_ROOM + " WHERE " + COLUMN_ROOM_NAME + " = '" + name + "'", null);
 
+        int value = 0;
+        if(c != null && c.moveToFirst()) {
+            value = c.getInt(c.getColumnIndex(COLUMN_ID));
+        }
+
+        return value;
+    }
+
+    public void updateCourse(String name, String room, int course_id) {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "UPDATE " + TABLE_COURSE + " SET " + COLUMN_COURSE_NAME + " = '" + name + "' , " +
+                                COLUMN_ROOM_NUMBER + " = " + findRoomNumber(room) + " WHERE " + COLUMN_ID +
+                                " = " + course_id + ";";
+        System.out.println(query);
+        db.execSQL(query);
     }
 }
