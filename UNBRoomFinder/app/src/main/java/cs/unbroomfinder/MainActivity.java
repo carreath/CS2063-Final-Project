@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String DEBUG_TAG = "DEBUG";
     public static Map map;
     public static Door door;
-    public static GoogleApiClient mGoogleApiClient;
+    public static GoogleGPS googleGPS = null;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -53,13 +53,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
+        googleGPS = new GoogleGPS(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -84,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         }
         door = new Door(this);
 
-        setPath(door.getNearestDoor(), 116);
+        setPath(door.getNearestDoor(), 115);
     }
 
     /**

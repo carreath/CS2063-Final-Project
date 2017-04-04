@@ -184,10 +184,10 @@ public class BuildingMapActivity extends AppCompatActivity {
 
             paint.setStrokeWidth(2 * (PATH_RADIUS + 4));
             paint.setColor(Color.parseColor("#609dff"));
-            canvas.drawLine(x1,y1,x2,y2, paint);
+            canvas.drawLine(x1 + PATH_RADIUS,y1 + PATH_RADIUS,x2 + PATH_RADIUS,y2 + PATH_RADIUS, paint);
 
             paint.setStrokeWidth(2 * PATH_RADIUS);
-            canvas.drawLine(x1,y1,x2,y2, paint);
+            canvas.drawLine(x1 + PATH_RADIUS,y1 + PATH_RADIUS,x2 + PATH_RADIUS,y2 + PATH_RADIUS, paint);
         }
 
         float grabbedX = 0, grabbedY = 0;

@@ -72,37 +72,7 @@ public class Door {
     }
     public LatLng getLocation()
     {
-        // Get the location manager
-        LocationManager locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        Log.d(DEBUG_TAG, (locationManager == null) + "");
-        Location location = null;
-
-        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        Log.i("ISENABLED", isGPSEnabled + "");
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            if (ContextCompat.checkSelfPermission(context.getApplicationContext(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context.getApplicationContext(), ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                Log.i("WRONG API VERSION", "Permissions granted");
-            } else {
-
-                Log.i("WRONG API VERSION", "API VERSION ABOVE 23");
-                return new LatLng(45.949790, -66.641709);
-            }
-        }
-        else
-        {
-            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-            {
-                Log.i("Provider Available", "FFFFF");
-            }
-            else {
-                Log.i("Provider Unavailable", "FFFFF");
-                return new LatLng(45.949790, -66.641709);
-            }
-        }
+        Location location = MainActivity.googleGPS.getLocation();
 
         Double lat,lon;
         try {
